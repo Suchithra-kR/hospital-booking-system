@@ -62,7 +62,7 @@ const loginUser = async (req,res) =>{
         const user = await userModel.findOne({email})
 
         if (!user) {
-            res.json({success:false,message:'User does not exist'}) 
+           return  res.json({success:false,message:'User does not exist'}) 
         }
 
         const isMatch = await bcrypt.compare(password,user.password)
@@ -82,5 +82,21 @@ const loginUser = async (req,res) =>{
     }
 }
 
+//API to get user profile data
 
-export {registerUser,loginUser}
+const getProfile = async (req,res)=>{
+   try {
+
+      const { userId } = req.user
+      const userData = await userModel.findById(userId).select('-password')
+      
+      res.json({success:true,userData})
+    
+   } catch (error) {
+    console.log(error)
+    res.json({success:false,message:error.message})
+
+   }
+}
+
+export {registerUser,loginUser, getProfile}
