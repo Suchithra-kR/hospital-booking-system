@@ -1,13 +1,16 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
 import RelatedDoctors from '../components/RelatedDoctors'
+import { toast } from 'react-toastify'
 
-const Appointments = () => {
+const Appointment = () => {
   const { docId } = useParams()
-  const { doctors, currencySymbol } = useContext(AppContext)
+  const { doctors, currencySymbol, backendUrl, token, getDoctorsData } = useContext(AppContext)
   const daysOfWeek = ['SUN' , 'MON' , 'TUE' , 'WED' , 'THU' , 'FRI' , 'SAT']
+
+const navigate = useNavigate()
 
   const [docInfo, setDocInfo] = useState(null)
   const [docSlots, setDocSlots] = useState([])
@@ -62,6 +65,27 @@ const Appointments = () => {
       setDocSlots(prev => [...prev, timeSlots]) // ✅ fixed variable name
     }
   }
+  //call api to book appointment
+  const bookAppointment = async () =>{
+  if (!token) {
+    toast.warn('Login  to book appointment')
+    return  navigate('/login')
+  }
+ try {
+    const date = docSlots[slotIndex][0].dateTime
+    let day = date.getDate()
+    let month = date.getMonth()+1
+    let year = date.getFullYear()
+
+    const slotDate = day +"_" + month + "_" + year
+    console.log(slotDate);
+ } catch (error) {
+  
+ }
+}
+useEffect(() => {
+  console.log("✅ Appointment page loaded:", docId)
+}, [docId])
 
   useEffect(() => {
     fetchDocInfo()
@@ -124,7 +148,7 @@ const Appointments = () => {
       </p>
     ))}
   </div>
-  <button className='bg-primary text-white text-sm font-light px-14 py-3 rounded-full my-6'>Book an Appointment</button>
+  <button onClick={bookAppointment} className='bg-primary text-white text-sm font-light px-14 py-3 rounded-full my-6'>Book an Appointment</button>
 </div>
 {/* ---------listing related doctors-------- */}
 <RelatedDoctors docId={docId} speciality={docInfo.speciality}/>
@@ -133,4 +157,4 @@ const Appointments = () => {
   )
 }
 
-export default Appointments
+export default Appointment
